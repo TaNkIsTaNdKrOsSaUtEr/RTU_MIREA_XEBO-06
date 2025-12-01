@@ -1,60 +1,96 @@
-```mermaid
+%%{init: {'theme': 'neutral', 'themeVariables': { 'fontFamily': 'Arial, sans-serif', 'fontSize': '14px'}}}%%
+
 flowchart TD
-    A[Начало процесса анализа] --> B
+    Start([🏁 Начало анализа]) --> LoadData
     
-    subgraph B [ШАГ 1: Загрузка данных]
-        B1[Загрузка CSV файла] --> B2[Вывод размера данных] --> B3[Просмотр первых строк]
+    subgraph LoadData [📂 ШАГ 1: Загрузка данных]
+        direction LR
+        LD1["`pd.read_csv()`<br>Загрузка CSV файла"] 
+        LD2["`.shape`<br>Анализ размерности"] 
+        LD3["`.head()`<br>Просмотр первых строк"]
     end
     
-    B --> C
+    LoadData --> ExploreData
     
-    subgraph C [ШАГ 2: Изучение данных]
-        C1[Анализ типов данных] --> C2[Статистика] --> C3[Поиск пропусков] --> C4[Распределение целевой переменной]
+    subgraph ExploreData [🔍 ШАГ 2: Изучение данных]
+        direction TB
+        ED1["`.info()`<br>Информация о типах данных"] 
+        ED2["`.describe()`<br>Статистический анализ"] 
+        ED3["`.isnull().sum()`<br>Поиск пропущенных значений"] 
+        ED4["`.value_counts()`<br>Распределение целевой переменной"]
     end
     
-    C --> D
+    ExploreData --> Preprocess
     
-    subgraph D [ШАГ 3: Предобработка]
-        D1[Заполнение пропусков медианой] --> D2[Проверка отсутствия пропусков]
+    subgraph Preprocess [⚙️ ШАГ 3: Предобработка данных]
+        direction LR
+        P1["`fillna(median)`<br>Заполнение пропусков медианой"] 
+        P2["Проверка отсутствия пропусков"] 
     end
     
-    D --> E
+    Preprocess --> Visualize
     
-    subgraph E [ШАГ 4: Визуализация]
-        E1[Распределение магнитуды] --> E2[Распределение глубины] --> E3[Цунами по годам]
-        E3 --> E4[Карта землетрясений] --> E5[Матрица корреляций] --> E6[Соотношение классов]
+    subgraph Visualize [📊 ШАГ 4: Визуализация]
+        direction TB
+        V1["Графики распределения<br>(магнитуда, глубина)"] 
+        V2["Динамика по годам"] 
+        V3["Карта землетрясений"] 
+        V4["Матрица корреляций"] 
+        V5["Соотношение классов"]
     end
     
-    E --> F
+    Visualize --> PrepareML
     
-    subgraph F [ШАГ 5: Подготовка для моделей]
-        F1[Выбор признаков] --> F2[Разделение на train/test] --> F3[Стандартизация данных]
+    subgraph PrepareML [🎯 ШАГ 5: Подготовка к ML]
+        direction LR
+        PM1["Выбор признаков<br>(исключаем Year, Month)"] 
+        PM2["`train_test_split`<br>70% train, 30% test"] 
+        PM3["`StandardScaler`<br>Стандартизация данных"]
     end
     
-    F --> G
+    PrepareML --> TrainModels
     
-    subgraph G [ШАГ 6: Обучение моделей]
-        G1[Дерево решений] --> G2[Случайный лес] --> G3[SVM]
-        G3 --> G4[KNN] --> G5[Логистическая регрессия] --> G6[Наивный Байес]
+    subgraph TrainModels [🤖 ШАГ 6: Обучение моделей]
+        direction TB
+        TM1[Дерево решений<br>+ GridSearchCV] 
+        TM2[Случайный лес<br>+ GridSearchCV] 
+        TM3[SVM<br>+ GridSearchCV] 
+        TM4[KNN<br>+ GridSearchCV] 
+        TM5[Логистическая регрессия<br>+ GridSearchCV] 
+        TM6[Наивный Байес]
     end
     
-    G --> H
+    TrainModels --> CompareResults
     
-    subgraph H [ШАГ 7: Сравнение результатов]
-        H1[Создание таблицы результатов] --> H2[Визуализация метрик] --> H3[Матрица ошибок лучшей модели]
+    subgraph CompareResults [📈 ШАГ 7: Сравнение результатов]
+        direction LR
+        CR1["Сводная таблица метрик<br>(Accuracy, Precision, Recall, F1)"] 
+        CR2["Визуализация результатов<br>4 сравнительных графика"] 
+        CR3["Матрица ошибок<br>лучшей модели"]
     end
     
-    H --> I
+    CompareResults --> Analyze
     
-    subgraph I [ШАГ 8: Анализ]
-        I1[Определение лучшей модели] --> I2[Важность признаков] --> I3[Итоговый отчёт]
+    subgraph Analyze [💡 ШАГ 8: Анализ и выводы]
+        direction TB
+        A1["Определение лучшей модели<br>по метрикам"] 
+        A2["`classification_report`<br>Подробный отчёт"] 
+        A3["Важность признаков<br>(для tree-based моделей)"] 
+        A4["Итоговое резюме<br>и выводы"]
     end
     
-    I --> J[Конец анализа]
-    
+    Analyze --> End([✅ Завершение анализа])
+
     %% Стилизация
-    classDef process fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef step fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    class B,C,D,E,F,G,H,I step
-    class B1,B2,B3,C1,C2,C3,C4,D1,D2,E1,E2,E3,E4,E5,E6,F1,F2,F3,G1,G2,G3,G4,G5,G6,H1,H2,H3,I1,I2,I3 process
-```
+    classDef startEnd fill:#4CAF50,stroke:#2E7D32,color:white,stroke-width:2px
+    classDef stepHeader fill:#2196F3,stroke:#1565C0,color:white,font-weight:bold
+    classDef process fill:#E8F5E8,stroke:#4CAF50,stroke-width:1.5px
+    classDef mlProcess fill:#E3F2FD,stroke:#1976D2,stroke-width:1.5px
+    classDef visualProcess fill:#F3E5F5,stroke:#7B1FA2,stroke-width:1.5px
+    
+    class Start,End startEnd
+    class LoadData,ExploreData,Preprocess,Visualize,PrepareML,TrainModels,CompareResults,Analyze stepHeader
+    class LD1,LD2,LD3,PM1,PM2,PM3,CR1,CR2,CR3 process
+    class ED1,ED2,ED3,ED4,P1,P2,A1,A2,A3,A4 mlProcess
+    class TM1,TM2,TM3,TM4,TM5,TM6 visualProcess
+    class V1,V2,V3,V4,V5 visualProcess
