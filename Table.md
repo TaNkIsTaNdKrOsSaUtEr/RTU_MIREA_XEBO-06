@@ -1,4 +1,6 @@
+
 ```mermaid
+
 flowchart TD
     A[🏁 Начало анализа данных] --> B
     
